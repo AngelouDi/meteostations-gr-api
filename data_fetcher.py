@@ -1,6 +1,4 @@
 import re
-import requests
-from bs4 import BeautifulSoup
 
 
 def split_string_data(string_data):
@@ -73,9 +71,7 @@ def get_today_highs(soup):
         # print(time)
 
 
-def get_data(station):
-    url = 'http://penteli.meteo.gr/stations/' + station
-    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+def get_data(soup):
     get_metadata(soup)
     get_live_data(soup)
     get_highs_lows(soup)
