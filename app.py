@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-import meteo_data
+import data_retreiver
 import available_stations
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ def home():
 def api_station():
     if 'station' in request.args:
         print(request.args['station'])
-        return jsonify(meteo_data.get_data(station=request.args['station']))
+        return jsonify(data_retreiver.get_data(station=request.args['station']))
     else:
         return "Error: No station provided. Please specify a station."
 

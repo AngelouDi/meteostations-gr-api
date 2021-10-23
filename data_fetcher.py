@@ -1,6 +1,4 @@
 import re
-import requests
-from bs4 import BeautifulSoup
 
 
 def split_string_data(string_data):
@@ -44,7 +42,10 @@ def get_live_data(soup):
                        "Storm Total", "Monthly Rain", "Yearly Rain", "Wind Chill", "Heat Index", "Solar Radiation",
                        "UV Index", "Sunrise", "Sunset"]
     for data_name in live_data_names:
-        result = soup.find(text=data_name).find_next("div").text
+        try:
+            result = soup.find(text=data_name).find_next("div").text
+        except:
+            result = ''
         data[data_name] = result
         # print(data_name)
         # print(result)
@@ -64,18 +65,22 @@ def get_today_highs(soup):
                          "High Solar Radiation",
                          "High UV Index"]
     for data_name in today_highs_names:
-        result = soup.find(text=data_name).find_next("div").text.strip()
-        value = re.split(" at ", result)[0]
-        time = re.split(" at ", result)[1]
-        data[data_name] = {"value": value, "time": time}
+        try:
+            result = soup.find(text=data_name).find_next("div").text.strip()
+            value = re.split(" at ", result)[0]
+            time = re.split(" at ", result)[1]
+            data[data_name] = {"value": value, "time": time}
+        except AttributeError:
+            data[data_name] = {"value": '', "time": ''}
+        except IndexError:
+            data[data_name] = {"value": value, "time": ''}
+
         # print(data_name)
         # print(value)
         # print(time)
 
 
-def get_data(station):
-    url = 'http://penteli.meteo.gr/stations/' + station
-    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+def get_data(soup):
     get_metadata(soup)
     get_live_data(soup)
     get_highs_lows(soup)
