@@ -41,13 +41,18 @@ def split_string_data(string_data):
     time = re.findall("\d?\d:\d\d", string_data)
     temp = re.findall("\d\d.\d°C", string_data)
     wind = re.findall("\d\d.\d", string_data)
+    rain = re.findall("\d.*mm\/hr", string_data)
     pressure = re.findall("\d\d\d\d\.\d", string_data)
 
     if pressure:
         pressure[0] += " hPa"
-    for value in [temp, wind, pressure]:
+    for value in [temp, wind, pressure, rain]:
         if value:
-            return {"value": value[0], "time": time[0]}
+            if time:
+                return {"value": value[0], "time": time[0]}
+            else:
+                return {"value": value[0], "time": ""}
+
 
 
 def get_live_data(soup):
@@ -81,9 +86,19 @@ def get_today_highs(soup):
         # print(value)
         # print(time)
 
+def get_metadata(soup):
+    title = soup.find(text=re.compile("\d\d?:.*.\/\d\d"))
+    station = title.split(',')[0].strip()
+    time = re.findall("\d+:\d\d", title)[0]
+    date = re.findall("\d+\/\d+\/\d+", title)[0]
+    data["station"] = station
+    data["time"] = time
+    data["date"] = date
+
+
 
 def get_data(soup):
-    # get_metadata(soup)
+    get_metadata(soup)
     get_live_data(soup)
     get_highs_lows(soup)
     get_today_highs(soup)
